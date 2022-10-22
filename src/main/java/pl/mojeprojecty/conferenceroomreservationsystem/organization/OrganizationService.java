@@ -10,13 +10,14 @@ import pl.mojeprojecty.conferenceroomreservationsystem.organization.model.Organi
 
 import javax.persistence.EntityNotFoundException;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @Transactional
-@Slf4j
 @RequiredArgsConstructor
-public class OrganizationService {
+class OrganizationService {
 
     private final OrganizationRepository organizationRepository;
 
@@ -25,7 +26,7 @@ public class OrganizationService {
      *
      * @return found {@link List<OrganizationDto>} of all organization
      */
-    public List<OrganizationDto> getListOfOrganization() {
+    List<OrganizationDto> getListOfOrganization() {
         return organizationRepository.findAll().stream()
                 .map(OrganizationMapper::toOrganizationDto)
                 .collect(Collectors.toList());
@@ -38,7 +39,14 @@ public class OrganizationService {
      * @param request  - params of organization to create
      * @return created {@link OrganizationDto}
      */
-    public OrganizationDto createOrganization(OrganizationRequest request) {
+    OrganizationDto createOrganization(OrganizationRequest request) {
+        if (organizationRepository.existsByName(request.getName())){
+            throw new IllegalArgumentException("Organization already exists!");
+        }
+//        organizationRepository.findByName(request.getName())
+//                        .ifPresent(o -> {
+//                            throw new IllegalArgumentException("Organization already exists!");
+//                        });
         validateCorrectRequest(request);
         OrganizationEntity organizationEntity = OrganizationMapper.requestToOrganizationEntity(request);
 
@@ -55,7 +63,7 @@ public class OrganizationService {
      * @param request - params of organization to update
      * @return updated {@link OrganizationDto}
      */
-    public OrganizationDto updateOrganization(Long organizationId, OrganizationRequest request) {
+    OrganizationDto updateOrganization(Long organizationId, OrganizationRequest request) {
         validateCorrectRequest(organizationId, request);
         OrganizationEntity organizationEntity = OrganizationMapper.requestToOrganizationEntity(organizationId, request);
 
@@ -69,14 +77,14 @@ public class OrganizationService {
      * If the organization does not exist in DB, then the implementation might throw an {@link EntityNotFoundException}.
      *
      * @param organizationId - id of organization to delete
+     * return deleted {@link OrganizationDto}
      */
-    public void deleteOrganization(Long organizationId) {
-        if (organizationRepository.findById(organizationId).isEmpty()) {
-            log.error("Organization does not exist in DB, delete is not permitted!");
-            throw new EntityNotFoundException("Organization wit id: " + organizationId + " does not exist in DB, delete is not permitted!");
-        }
+    OrganizationDto deleteOrganization(Long organizationId) {
+        OrganizationEntity organization = organizationRepository.findById(organizationId)
+                .orElseThrow(() -> new EntityNotFoundException("Organization wit id: " + organizationId + " does not exist in DB, delete is not permitted!"));
         log.info("Deleting organization with id {}", organizationId);
         organizationRepository.deleteById(organizationId);
+        return OrganizationMapper.toOrganizationDto(organization);
     }
 
     private void validateCorrectRequest(OrganizationRequest request) {
