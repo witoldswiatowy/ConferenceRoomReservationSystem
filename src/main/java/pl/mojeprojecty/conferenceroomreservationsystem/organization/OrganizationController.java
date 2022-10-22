@@ -10,12 +10,13 @@ import java.util.List;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/organization")
+@RequestMapping("/api/organizations")
 @RequiredArgsConstructor
 public class OrganizationController {
 
     private final OrganizationService organizationService;
 
+    @GetMapping
     public List<OrganizationDto> getListOfOrganization (){
         log.info("Methode getListOfOrganization was called");
         return organizationService.getListOfOrganization();
@@ -27,16 +28,16 @@ public class OrganizationController {
         return organizationService.createOrganization(request);
     }
 
-    @PostMapping("/{id}")
+    @PutMapping("/{id}")
     public OrganizationDto updateOrganization(
             @RequestBody OrganizationRequest request,
-            @PathVariable Long organizationId) {
+            @PathVariable(name = "id") Long organizationId) {
         log.info("Methode updateOrganization was called");
         return organizationService.updateOrganization(organizationId, request);
     }
 
     @DeleteMapping("/{id}")
-    public void deleteOrganization(@PathVariable Long organizationId) {
+    public void deleteOrganization(@PathVariable(name = "id") Long organizationId) {
         log.info("Methode updateOrganization was called");
         organizationService.deleteOrganization(organizationId);
     }

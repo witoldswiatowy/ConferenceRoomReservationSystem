@@ -25,7 +25,7 @@ public class OrganizationEntity {
     @Column(name = "version", length = 19, nullable = false)
     private Long version;
 
-    private String Name;
+    private String name;
 
     @PrePersist
     public void createDate() {
