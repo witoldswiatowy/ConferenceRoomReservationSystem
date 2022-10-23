@@ -37,4 +37,8 @@ public class OrganizationEntity {
     public void updateDate() {
         this.updateDate = LocalDateTime.now();
     }
+
+    public OrganizationEntity(String name) {
+        this.name = name;
+    }
 }

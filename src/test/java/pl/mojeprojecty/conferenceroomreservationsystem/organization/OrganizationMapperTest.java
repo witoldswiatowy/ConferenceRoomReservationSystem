@@ -19,7 +19,7 @@ class OrganizationMapperTest {
         OrganizationEntity organization = new OrganizationEntity();
         organization.setName(randomUUID().toString());
         organization.setId(1L);
-        organization.setVersion(1L);
+//        organization.setVersion(1L);
         organization.setCreateDate(NOW);
         organization.setUpdateDate(NOW);
 
