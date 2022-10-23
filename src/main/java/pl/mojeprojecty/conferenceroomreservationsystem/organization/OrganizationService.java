@@ -10,6 +10,7 @@ import pl.mojeprojecty.conferenceroomreservationsystem.organization.model.Organi
 import pl.mojeprojecty.conferenceroomreservationsystem.organization.model.OrganizationEntity;
 
 import javax.persistence.EntityNotFoundException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -23,25 +24,58 @@ class OrganizationService {
     private final OrganizationRepository organizationRepository;
 
     /**
-     * Method to get all organization.
+     * Method to get all organization with ordering.
      *
      * @return found {@link List<OrganizationDto>} of all organization
      */
-    List<OrganizationDto> getListOfOrganization() {
-        return organizationRepository.findAll().stream()
-                .map(OrganizationMapper::toOrganizationDto)
-                .collect(Collectors.toList());
+    List<OrganizationDto> getListOfOrganization(SortType sortType) {
+        if (sortType != null) {
+            return organizationRepository.findAll(sortType.getSort("name")).stream()
+                    .map(OrganizationMapper::toOrganizationDto)
+                    .collect(Collectors.toList());
+        } else {
+            return organizationRepository.findAll().stream()
+                    .map(OrganizationMapper::toOrganizationDto)
+                    .collect(Collectors.toList());
+        }
     }
+
+    /**
+     * Methode to get list of organization in order
+     *
+     * @param isAscending - this is flag to order list with organizations
+     * @return found and ordering {@link List<OrganizationDto>} of all organization
+     */
+    List<OrganizationDto> getSortingListOfOrganization(boolean isAscending) {
+        List<OrganizationDto> list;
+        if (isAscending) {
+            list = organizationRepository.findAllByOrderByNameAsc().stream()
+                    .map(OrganizationMapper::toOrganizationDto)
+                    .collect(Collectors.toList());
+        } else {
+            list = organizationRepository.findAllByOrderByNameDesc().stream()
+                    .map(OrganizationMapper::toOrganizationDto)
+                    .collect(Collectors.toList());
+        }
+        return list;
+    }
+
+    List<OrganizationDto> getOrganizationByName(String name){
+        return organizationRepository.findByNameContainingIgnoreCase(name).stream()
+                .map(OrganizationMapper::toOrganizationDto)
+                .toList();
+    }
+
 
     /**
      * Persists the passed organization.
      * If the organization has already DB ID assigned, then the implementation might throw an {@link IllegalArgumentException}.
      *
-     * @param request  - params of organization to create
+     * @param request - params of organization to create
      * @return created {@link OrganizationDto}
      */
     OrganizationDto createOrganization(OrganizationRequest request) {
-        if (organizationRepository.existsByName(request.getName())){
+        if (organizationRepository.existsByName(request.getName())) {
             throw new IllegalArgumentException("Organization already exists!");
         }
 //        organizationRepository.findByName(request.getName())
@@ -76,7 +110,7 @@ class OrganizationService {
      * If the organization does not exist in DB, then the implementation might throw an {@link EntityNotFoundException}.
      *
      * @param organizationId - id of organization to delete
-     * return deleted {@link OrganizationDto}
+     *                       return deleted {@link OrganizationDto}
      */
     OrganizationDto deleteOrganization(Long organizationId) {
         OrganizationEntity organization = organizationRepository.findById(organizationId)
@@ -87,15 +121,15 @@ class OrganizationService {
     }
 
     private void validateCorrectRequest(OrganizationRequest request) {
-        if (request == null){
+        if (request == null) {
             log.error("Request what you want to use is null!");
             throw new IllegalArgumentException();
         }
-        if (request.getName() != null){
-            if (request.getName().isEmpty()){
+        if (request.getName() != null) {
+            if (request.getName().isEmpty()) {
                 log.error("Name of organization can not be empty");
                 throw new IllegalArgumentException();
-            } else if(request.getName().isBlank()){
+            } else if (request.getName().isBlank()) {
                 log.error("Name of organization can not be blank");
                 throw new IllegalArgumentException();
             }
@@ -103,18 +137,18 @@ class OrganizationService {
     }
 
     private void validateCorrectRequest(Long organizationId, OrganizationRequest request) {
-        if(organizationRepository.findById(organizationId).isEmpty()){
+        if (organizationRepository.findById(organizationId).isEmpty()) {
             throw new EntityNotFoundException("Organization wit id: " + organizationId + " does not exist in DB, delete is not permitted!");
         }
-        if (request == null){
+        if (request == null) {
             log.error("Request what you want to use is null!");
             throw new IllegalArgumentException();
         }
-        if (request.getName() != null){
-            if (request.getName().isEmpty()){
+        if (request.getName() != null) {
+            if (request.getName().isEmpty()) {
                 log.error("Name of organization can not be empty");
                 throw new IllegalArgumentException();
-            } else if(request.getName().isBlank()){
+            } else if (request.getName().isBlank()) {
                 log.error("Name of organization can not be blank");
                 throw new IllegalArgumentException();
             }

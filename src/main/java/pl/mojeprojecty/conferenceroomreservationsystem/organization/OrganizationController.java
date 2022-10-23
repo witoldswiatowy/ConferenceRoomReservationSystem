@@ -15,6 +15,7 @@ import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 @Slf4j
 @RestController
@@ -25,9 +26,21 @@ public class OrganizationController {
     private final OrganizationService organizationService;
 
     @GetMapping
-    public List<OrganizationDto> getListOfOrganization (){
+    public List<OrganizationDto> getListOfOrganization(@RequestParam (required = false) SortType sortType){
         log.info("Methode getListOfOrganization was called");
-        return organizationService.getListOfOrganization();
+        return organizationService.getListOfOrganization(sortType);
+    }
+
+    @GetMapping("/{flag}") //todo zmienić to RequestParam
+    public List<OrganizationDto> getSortingListOfOrganization(@PathVariable boolean flag){
+        log.info("Methode getListOfOrganization was called");
+        return organizationService.getSortingListOfOrganization(flag);
+    }
+
+    @GetMapping("/{name}")
+    public List<OrganizationDto> getOrganizationByName(@RequestParam String name){
+        log.info("Methode getListOfOrganization was called");
+        return organizationService.getOrganizationByName(name);
     }
 
     @PostMapping
@@ -36,10 +49,9 @@ public class OrganizationController {
         return organizationService.createOrganization(request);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping()
     public OrganizationDto updateOrganization(
-            @RequestBody OrganizationCreateRequest request,
-            @PathVariable(name = "id") Long organizationId) {
+            @RequestBody OrganizationCreateRequest request) {
         log.info("Methode updateOrganization was called");
         return organizationService.updateOrganization(request);
     }
@@ -48,6 +60,16 @@ public class OrganizationController {
     public void deleteOrganization(@PathVariable(name = "id") Long organizationId) {
         log.info("Methode updateOrganization was called");
         organizationService.deleteOrganization(organizationId);
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<Object> handleIllegalArgumentException(IllegalArgumentException e) {
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(NoSuchElementException.class)
+    public ResponseEntity<Object> handleNoSuchElementException(NoSuchElementException e) {
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
