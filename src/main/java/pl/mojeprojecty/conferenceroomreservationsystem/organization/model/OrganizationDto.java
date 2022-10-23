@@ -14,6 +14,6 @@ public class OrganizationDto {
     private Long id;
     private LocalDateTime createDate;
     private LocalDateTime updateDate;
-    private Long version;
+//    private Long version;
     private String name;
 }

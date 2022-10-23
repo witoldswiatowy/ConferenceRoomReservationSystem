@@ -4,12 +4,10 @@ import org.junit.jupiter.api.Test;
 import pl.mojeprojecty.conferenceroomreservationsystem.organization.model.OrganizationDto;
 import pl.mojeprojecty.conferenceroomreservationsystem.organization.model.OrganizationEntity;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import static java.util.UUID.randomUUID;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 class OrganizationMapperTest {
 

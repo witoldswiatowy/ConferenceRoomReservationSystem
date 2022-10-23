@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import pl.mojeprojecty.conferenceroomreservationsystem.organization.model.OrganizationCreateRequest;
 import pl.mojeprojecty.conferenceroomreservationsystem.organization.model.OrganizationRequest;
 import pl.mojeprojecty.conferenceroomreservationsystem.organization.model.OrganizationDto;
 import pl.mojeprojecty.conferenceroomreservationsystem.organization.model.OrganizationEntity;
@@ -59,13 +60,11 @@ class OrganizationService {
      * Update the passed organization.
      * If the organization does not exist in DB, then the implementation might throw an {@link IllegalArgumentException}.
      *
-     * @param organizationId - id of organization to update
-     * @param request - params of organization to update
+     * @param request - id and params of organization to update
      * @return updated {@link OrganizationDto}
      */
-    OrganizationDto updateOrganization(Long organizationId, OrganizationRequest request) {
-        validateCorrectRequest(organizationId, request);
-        OrganizationEntity organizationEntity = OrganizationMapper.requestToOrganizationEntity(organizationId, request);
+    OrganizationDto updateOrganization(OrganizationCreateRequest request) {
+        OrganizationEntity organizationEntity = OrganizationMapper.createRequestToOrganizationEntity(request);
 
         OrganizationEntity updatedOrganizationEntity = organizationRepository.save(organizationEntity);
         log.info("Update organization {}", updatedOrganizationEntity);

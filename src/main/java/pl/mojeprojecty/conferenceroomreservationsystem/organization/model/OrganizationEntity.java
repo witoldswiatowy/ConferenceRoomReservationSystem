@@ -21,9 +21,9 @@ public class OrganizationEntity {
     private LocalDateTime createDate;
     @Column(name = "update_date", length = 6, nullable = false)
     private LocalDateTime updateDate;
-    @Version
-    @Column(name = "version", length = 19, nullable = false)
-    private Long version;
+//    @Version
+//    @Column(name = "version", length = 19, nullable = false)
+//    private Long version;
 
     private String name;
 
