@@ -84,6 +84,11 @@ class OrganizationService {
     OrganizationDto updateOrganization(OrganizationUpdateRequest request) {
         OrganizationEntity organizationEntity = organizationRepository.findById(request.getId())
                 .orElseThrow(() -> new EntityNotFoundException("No organization to update found!"));
+
+        if(organizationRepository.existsByName(request.getName())){
+            throw new IllegalArgumentException("Organization with this name already exists!");
+        }
+
         organizationEntity.setName(request.getName());
         OrganizationEntity updatedOrganizationEntity = organizationRepository.save(organizationEntity);
         log.info("Update organization {}", updatedOrganizationEntity);
