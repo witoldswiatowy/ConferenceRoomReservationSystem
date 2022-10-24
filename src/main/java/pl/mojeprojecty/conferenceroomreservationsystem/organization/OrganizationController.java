@@ -7,7 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
-import pl.mojeprojecty.conferenceroomreservationsystem.organization.model.OrganizationCreateRequest;
+import pl.mojeprojecty.conferenceroomreservationsystem.organization.model.OrganizationUpdateRequest;
 import pl.mojeprojecty.conferenceroomreservationsystem.organization.model.OrganizationRequest;
 import pl.mojeprojecty.conferenceroomreservationsystem.organization.model.OrganizationDto;
 
@@ -31,12 +31,6 @@ public class OrganizationController {
         return organizationService.getListOfOrganization(sortType);
     }
 
-    @GetMapping("/{flag}") //todo zmienić to RequestParam
-    public List<OrganizationDto> getSortingListOfOrganization(@PathVariable boolean flag){
-        log.info("Methode getListOfOrganization was called");
-        return organizationService.getSortingListOfOrganization(flag);
-    }
-
     @GetMapping("/{name}")
     public List<OrganizationDto> getOrganizationByName(@RequestParam String name){
         log.info("Methode getListOfOrganization was called");
@@ -49,9 +43,9 @@ public class OrganizationController {
         return organizationService.createOrganization(request);
     }
 
-    @PutMapping()
+    @PutMapping
     public OrganizationDto updateOrganization(
-            @RequestBody OrganizationCreateRequest request) {
+            @RequestBody OrganizationUpdateRequest request) {
         log.info("Methode updateOrganization was called");
         return organizationService.updateOrganization(request);
     }
