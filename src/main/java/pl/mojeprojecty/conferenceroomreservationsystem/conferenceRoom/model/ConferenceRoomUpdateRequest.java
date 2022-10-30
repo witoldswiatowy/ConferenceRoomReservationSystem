@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import pl.mojeprojecty.conferenceroomreservationsystem.organization.model.OrganizationDto;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
@@ -17,7 +16,7 @@ import javax.validation.constraints.Size;
 @AllArgsConstructor
 public class ConferenceRoomUpdateRequest {
 
-    private long id;
+    private long conferenceRoomId;
 
     @NotBlank
     @Size(min = 2, max = 20)

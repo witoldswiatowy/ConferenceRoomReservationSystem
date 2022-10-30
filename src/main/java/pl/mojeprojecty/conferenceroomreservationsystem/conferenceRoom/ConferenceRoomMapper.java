@@ -68,7 +68,7 @@ public class ConferenceRoomMapper {
 
     public static ConferenceRoomEntity updateRequestToConferenceRoomEntity(ConferenceRoomUpdateRequest request) {
         ConferenceRoomEntity conferenceRoomEntity = new ConferenceRoomEntity();
-        conferenceRoomEntity.setId(request.getId());
+        conferenceRoomEntity.setId(request.getConferenceRoomId());
         conferenceRoomEntity.setName(request.getName());
         conferenceRoomEntity.setIdentifier(request.getIdentifier());
         conferenceRoomEntity.setFloor(request.getFloor());

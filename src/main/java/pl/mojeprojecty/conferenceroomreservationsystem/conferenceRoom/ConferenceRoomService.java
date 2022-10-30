@@ -61,7 +61,7 @@ public class ConferenceRoomService {
     }
 
     ConferenceRoomDto update(ConferenceRoomUpdateRequest request) {
-        ConferenceRoomEntity conferenceRoomEntity = conferenceRoomRepository.findById(request.getId())
+        ConferenceRoomEntity conferenceRoomEntity = conferenceRoomRepository.findById(request.getConferenceRoomId())
                 .orElseThrow(() -> new EntityNotFoundException("No Conference Room to update found!"));
 
         if (conferenceRoomRepository.existsByIdentifier(request.getIdentifier())) {
@@ -70,6 +70,10 @@ public class ConferenceRoomService {
 
         OrganizationEntity managedOrganization = organizationRepository.findById(request.getOrganizationId())
                 .orElseThrow(() -> new EntityNotFoundException("No organization to found!"));
+
+        if(conferenceRoomRepository.existsByNameAndOrganization_Id(request.getName(), request.getOrganizationId())){
+            throw new IllegalArgumentException("Conference Room with this name already exist in organization!");
+        }
 
         conferenceRoomEntity.setName(request.getName());
         conferenceRoomEntity.setIdentifier(request.getIdentifier());

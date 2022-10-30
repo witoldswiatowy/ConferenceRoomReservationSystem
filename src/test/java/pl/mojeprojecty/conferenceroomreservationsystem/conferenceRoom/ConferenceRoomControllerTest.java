@@ -76,13 +76,18 @@ class ConferenceRoomControllerTest {
     void shouldUpdateConferenceRoom_whenRequestIsCorrect() throws Exception {
         //given
         OrganizationEntity google = organizationRepository.save(new OrganizationEntity("Google"));
-        ConferenceRoomEntity barbados = new ConferenceRoomEntity("Barbados", "Barbados", 1, true, 10, 2, google);
+        ConferenceRoomEntity barbados = conferenceRoomRepository.save(new ConferenceRoomEntity("Barbados", "Barbados", 1, true, 10, 2, google));
 
         //when, then
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/conferenceRooms").contentType(MediaType.APPLICATION_JSON)
+        mockMvc.perform(MockMvcRequestBuilders.put("/api/conferenceRooms").contentType(MediaType.APPLICATION_JSON)
                 .content("{\n" +
-                        "  \"id\": 1,\n" +
-                        "  \"name\": \"Zmieniona\",\n" +
+                        "  \"availability\": true,\n" +
+                        "  \"floor\": 0,\n" +
+                        "  \"conferenceRoomId\": 2,\n" +
+                        "  \"identifier\": \"string\",\n" +
+                        "  \"name\": \"string\",\n" +
+                        "  \"numberOfHammock\": 0,\n" +
+                        "  \"numberOfSeats\": 0,\n" +
                         "  \"organizationId\": 1\n" +
                         "}"))
                 .andExpect(jsonPath("$.name", equalTo("Zmieniona")))
