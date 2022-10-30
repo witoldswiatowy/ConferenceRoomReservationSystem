@@ -1,7 +1,7 @@
 package pl.mojeprojecty.conferenceroomreservationsystem.organization;
 
 import lombok.NoArgsConstructor;
-import pl.mojeprojecty.conferenceroomreservationsystem.organization.model.OrganizationCreateRequest;
+import pl.mojeprojecty.conferenceroomreservationsystem.organization.model.OrganizationUpdateRequest;
 import pl.mojeprojecty.conferenceroomreservationsystem.organization.model.OrganizationRequest;
 import pl.mojeprojecty.conferenceroomreservationsystem.organization.model.OrganizationDto;
 import pl.mojeprojecty.conferenceroomreservationsystem.organization.model.OrganizationEntity;
@@ -44,7 +44,7 @@ public class OrganizationMapper {
         return organizationEntity;
     }
 
-    public static OrganizationEntity createRequestToOrganizationEntity(OrganizationCreateRequest request) {
+    public static OrganizationEntity createRequestToOrganizationEntity(OrganizationUpdateRequest request) {
         OrganizationEntity organizationEntity = new OrganizationEntity();
         organizationEntity.setId(request.getId());
         organizationEntity.setName(request.getName());

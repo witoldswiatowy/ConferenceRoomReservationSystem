@@ -6,10 +6,12 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.springframework.data.domain.Sort;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import pl.mojeprojecty.conferenceroomreservationsystem.organization.model.OrganizationDto;
 import pl.mojeprojecty.conferenceroomreservationsystem.organization.model.OrganizationEntity;
 import pl.mojeprojecty.conferenceroomreservationsystem.organization.model.OrganizationRequest;
+import pl.mojeprojecty.conferenceroomreservationsystem.organization.model.OrganizationUpdateRequest;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.List;
@@ -30,10 +32,12 @@ class OrganizationServiceTest {
 
     @Captor
     ArgumentCaptor<OrganizationEntity> organizationCaptor;
+    @Captor
+    ArgumentCaptor<Sort> sortArgumentCaptor;
 
 
     @Test
-    void shouldCallMethodeFindAllFromRepository() {
+    void shouldCallMethodeFindAllFromRepository_withoutParams() {
         //given
         String name = "Name";
 
@@ -45,6 +49,46 @@ class OrganizationServiceTest {
         //then
         assertThat(result).hasSize(1);
         verify(organizationRepositoryMock, times(1)).findAll();
+    }
+
+    @Test
+    void shouldCallMethodeFindAllFromRepository_withParamsAsc() {
+        //given
+        String name_aaa = "aaa";
+        String name_bbb = "bbb";
+        SortType sortType = SortType.ASC;
+        when(organizationRepositoryMock.findAll(sortType.getSort("name")))
+                .thenReturn(List.of(
+                        new OrganizationEntity(name_aaa),
+                        new OrganizationEntity(name_bbb)));
+
+        //when
+        List<OrganizationDto> result = organizationService.getListOfOrganization(sortType);
+
+        //then
+        assertThat(result).hasSize(2);
+        verify(organizationRepositoryMock, times(1)).findAll(sortArgumentCaptor.capture());
+        assertThat(sortArgumentCaptor.getValue()).isEqualTo(Sort.by(Sort.Direction.ASC, "name"));
+    }
+
+    @Test
+    void shouldCallMethodeFindAllFromRepository_withParamsDesc() {
+        //given
+        String name_aaa = "aaa";
+        String name_bbb = "bbb";
+        SortType sortType = SortType.DESC;
+        when(organizationRepositoryMock.findAll(sortType.getSort("name")))
+                .thenReturn(List.of(
+                        new OrganizationEntity(name_bbb),
+                        new OrganizationEntity(name_aaa)));
+
+        //when
+        List<OrganizationDto> result = organizationService.getListOfOrganization(sortType);
+
+        //then
+        assertThat(result).hasSize(2);
+        verify(organizationRepositoryMock, times(1)).findAll(sortArgumentCaptor.capture());
+        assertThat(sortArgumentCaptor.getValue()).isEqualTo(Sort.by(Sort.Direction.DESC, "name"));
     }
 
     @Test
@@ -100,7 +144,8 @@ class OrganizationServiceTest {
     void shouldCallMethodeDeleteFromRepository() {
         //given
         Long id = 1L;
-        OrganizationEntity organizationEntity = new OrganizationEntity("Name");
+        String name = "Name";
+        OrganizationEntity organizationEntity = new OrganizationEntity(name);
         organizationEntity.setId(id);
 
         when(organizationRepositoryMock.findById(id)).thenReturn(Optional.of(organizationEntity));
@@ -122,5 +167,59 @@ class OrganizationServiceTest {
         //when, then
         assertThatThrownBy(() -> organizationService.deleteOrganization(id))
                 .isInstanceOf(EntityNotFoundException.class);
+    }
+
+    @Test
+    void shouldCallMethodeUpdateOrganization_organizationExistAndUniqueName(){
+        //given
+        Long id = 1L;
+        String name = "Name";
+        String newName = "newName";
+        OrganizationEntity organizationEntity = new OrganizationEntity(name);
+        organizationEntity.setId(id);
+        OrganizationUpdateRequest request = new OrganizationUpdateRequest(id,newName);
+
+        when(organizationRepositoryMock.findById(id)).thenReturn(Optional.of(organizationEntity));
+        when(organizationRepositoryMock.existsByName(newName)).thenReturn(false);
+
+        //when
+        organizationService.updateOrganization(request);
+
+        //then
+        verify(organizationRepositoryMock).save(organizationCaptor.capture());
+        assertThat(organizationCaptor.getValue().getId()).isEqualTo(id);
+        assertThat(organizationCaptor.getValue().getName()).isEqualTo(newName);
+    }
+
+    @Test
+    void shouldThrownException_whenOrganizationNotExist(){
+        //given
+        long id = -1L;
+        String newName = "newName";
+        OrganizationUpdateRequest request = new OrganizationUpdateRequest(id,newName);
+
+        when(organizationRepositoryMock.findById(id)).thenReturn(Optional.empty());
+
+        //when, then
+        assertThatThrownBy(() -> organizationService.updateOrganization(request))
+                .isInstanceOf(EntityNotFoundException.class);
+    }
+
+    @Test
+    void shouldThrownException_whenOrganizationExistAndNotUniqueName(){
+        //given
+        Long id = 1L;
+        String name = "Name";
+        OrganizationEntity organizationEntity = new OrganizationEntity(name);
+        organizationEntity.setId(id);
+        OrganizationUpdateRequest request = new OrganizationUpdateRequest(id,name);
+
+        when(organizationRepositoryMock.findById(id)).thenReturn(Optional.of(organizationEntity));
+        when(organizationRepositoryMock.existsByName(name)).thenReturn(true);
+
+
+        //when, then
+        assertThatThrownBy(() -> organizationService.updateOrganization(request))
+                .isInstanceOf(IllegalArgumentException.class);
     }
 }

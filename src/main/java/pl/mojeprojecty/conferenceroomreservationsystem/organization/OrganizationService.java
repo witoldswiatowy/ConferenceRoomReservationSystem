@@ -4,15 +4,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import pl.mojeprojecty.conferenceroomreservationsystem.organization.model.OrganizationCreateRequest;
+import pl.mojeprojecty.conferenceroomreservationsystem.organization.model.OrganizationUpdateRequest;
 import pl.mojeprojecty.conferenceroomreservationsystem.organization.model.OrganizationRequest;
 import pl.mojeprojecty.conferenceroomreservationsystem.organization.model.OrganizationDto;
 import pl.mojeprojecty.conferenceroomreservationsystem.organization.model.OrganizationEntity;
 
 import javax.persistence.EntityNotFoundException;
-import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -24,8 +22,9 @@ class OrganizationService {
     private final OrganizationRepository organizationRepository;
 
     /**
-     * Method to get all organization with ordering.
+     * Method to get all organization with ordering when params is not Null.
      *
+     * @param sortType - type of order
      * @return found {@link List<OrganizationDto>} of all organization
      */
     List<OrganizationDto> getListOfOrganization(SortType sortType) {
@@ -41,25 +40,11 @@ class OrganizationService {
     }
 
     /**
-     * Methode to get list of organization in order
+     * Methode to get all organization with comparing name's fragment
      *
-     * @param isAscending - this is flag to order list with organizations
-     * @return found and ordering {@link List<OrganizationDto>} of all organization
+     * @param name - searching name's fragment
+     * @return found {@link List<OrganizationDto>} of all matching organization
      */
-    List<OrganizationDto> getSortingListOfOrganization(boolean isAscending) {
-        List<OrganizationDto> list;
-        if (isAscending) {
-            list = organizationRepository.findAllByOrderByNameAsc().stream()
-                    .map(OrganizationMapper::toOrganizationDto)
-                    .collect(Collectors.toList());
-        } else {
-            list = organizationRepository.findAllByOrderByNameDesc().stream()
-                    .map(OrganizationMapper::toOrganizationDto)
-                    .collect(Collectors.toList());
-        }
-        return list;
-    }
-
     List<OrganizationDto> getOrganizationByName(String name){
         return organizationRepository.findByNameContainingIgnoreCase(name).stream()
                 .map(OrganizationMapper::toOrganizationDto)
@@ -82,7 +67,6 @@ class OrganizationService {
 //                        .ifPresent(o -> {
 //                            throw new IllegalArgumentException("Organization already exists!");
 //                        });
-        validateCorrectRequest(request);
         OrganizationEntity organizationEntity = OrganizationMapper.requestToOrganizationEntity(request);
 
         OrganizationEntity savedOrganizationEntity = organizationRepository.save(organizationEntity);
@@ -97,9 +81,15 @@ class OrganizationService {
      * @param request - id and params of organization to update
      * @return updated {@link OrganizationDto}
      */
-    OrganizationDto updateOrganization(OrganizationCreateRequest request) {
-        OrganizationEntity organizationEntity = OrganizationMapper.createRequestToOrganizationEntity(request);
+    OrganizationDto updateOrganization(OrganizationUpdateRequest request) {
+        OrganizationEntity organizationEntity = organizationRepository.findById(request.getId())
+                .orElseThrow(() -> new EntityNotFoundException("No organization to update found!"));
 
+        if(organizationRepository.existsByName(request.getName())){
+            throw new IllegalArgumentException("Organization with this name already exists!");
+        }
+
+        organizationEntity.setName(request.getName());
         OrganizationEntity updatedOrganizationEntity = organizationRepository.save(organizationEntity);
         log.info("Update organization {}", updatedOrganizationEntity);
         return OrganizationMapper.toOrganizationDto(updatedOrganizationEntity);
@@ -118,40 +108,5 @@ class OrganizationService {
         log.info("Deleting organization with id {}", organizationId);
         organizationRepository.deleteById(organizationId);
         return OrganizationMapper.toOrganizationDto(organization);
-    }
-
-    private void validateCorrectRequest(OrganizationRequest request) {
-        if (request == null) {
-            log.error("Request what you want to use is null!");
-            throw new IllegalArgumentException();
-        }
-        if (request.getName() != null) {
-            if (request.getName().isEmpty()) {
-                log.error("Name of organization can not be empty");
-                throw new IllegalArgumentException();
-            } else if (request.getName().isBlank()) {
-                log.error("Name of organization can not be blank");
-                throw new IllegalArgumentException();
-            }
-        }
-    }
-
-    private void validateCorrectRequest(Long organizationId, OrganizationRequest request) {
-        if (organizationRepository.findById(organizationId).isEmpty()) {
-            throw new EntityNotFoundException("Organization wit id: " + organizationId + " does not exist in DB, delete is not permitted!");
-        }
-        if (request == null) {
-            log.error("Request what you want to use is null!");
-            throw new IllegalArgumentException();
-        }
-        if (request.getName() != null) {
-            if (request.getName().isEmpty()) {
-                log.error("Name of organization can not be empty");
-                throw new IllegalArgumentException();
-            } else if (request.getName().isBlank()) {
-                log.error("Name of organization can not be blank");
-                throw new IllegalArgumentException();
-            }
-        }
     }
 }

@@ -10,7 +10,7 @@ import javax.validation.constraints.Size;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class OrganizationCreateRequest {
+public class OrganizationUpdateRequest {
 
     private long id;
 
