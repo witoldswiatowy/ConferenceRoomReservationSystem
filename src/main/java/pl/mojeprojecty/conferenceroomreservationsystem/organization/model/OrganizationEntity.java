@@ -3,9 +3,11 @@ package pl.mojeprojecty.conferenceroomreservationsystem.organization.model;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import pl.mojeprojecty.conferenceroomreservationsystem.conferenceRoom.model.ConferenceRoomEntity;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 
 @Getter
@@ -26,6 +28,9 @@ public class OrganizationEntity {
 //    private Long version;
 
     private String name;
+
+    @OneToMany(mappedBy = "organization")
+    private List<ConferenceRoomEntity> conferenceRoomEntityList;
 
     @PrePersist
     public void createDate() {

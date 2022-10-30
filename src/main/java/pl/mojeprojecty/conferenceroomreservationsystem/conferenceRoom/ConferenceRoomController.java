@@ -1,4 +1,4 @@
-package pl.mojeprojecty.conferenceroomreservationsystem.organization;
+package pl.mojeprojecty.conferenceroomreservationsystem.conferenceRoom;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -7,9 +7,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
-import pl.mojeprojecty.conferenceroomreservationsystem.organization.model.OrganizationUpdateRequest;
-import pl.mojeprojecty.conferenceroomreservationsystem.organization.model.OrganizationRequest;
-import pl.mojeprojecty.conferenceroomreservationsystem.organization.model.OrganizationDto;
+import pl.mojeprojecty.conferenceroomreservationsystem.conferenceRoom.model.ConferenceRoomCreateRequest;
+import pl.mojeprojecty.conferenceroomreservationsystem.conferenceRoom.model.ConferenceRoomDto;
+import pl.mojeprojecty.conferenceroomreservationsystem.conferenceRoom.model.ConferenceRoomUpdateRequest;
+import pl.mojeprojecty.conferenceroomreservationsystem.organization.SortType;
 
 import javax.validation.Valid;
 import java.util.HashMap;
@@ -19,41 +20,40 @@ import java.util.NoSuchElementException;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/organizations")
+@RequestMapping("/api/conferenceRooms")
 @RequiredArgsConstructor
-public class OrganizationController {
+public class ConferenceRoomController {
 
-    private final OrganizationService organizationService;
+    private final ConferenceRoomService conferenceRoomService;
 
     @GetMapping
-    public List<OrganizationDto> getListOfOrganization(@RequestParam (required = false) SortType sortType){
-        log.info("Methode getListOfOrganization was called");
-        return organizationService.getListOfOrganization(sortType);
+    public List<ConferenceRoomDto> getList(@RequestParam(required = false) SortType sortType) {
+        log.info("Methode getListOfConferenceRoom was called");
+        return conferenceRoomService.getList(sortType);
     }
 
     @GetMapping("/{name}")
-    public List<OrganizationDto> getOrganizationByName(@RequestParam String name){
-        log.info("Methode getListOfOrganization was called");
-        return organizationService.getOrganizationByName(name);
+    public List<ConferenceRoomDto> getByName(@RequestParam String name) {
+        log.info("Methode getListOfConferenceRoom was called");
+        return conferenceRoomService.getByName(name);
     }
 
     @PostMapping
-    public OrganizationDto createOrganization(@Valid @RequestBody OrganizationRequest request) {
-        log.info("Methode createOrganization was called");
-        return organizationService.createOrganization(request);
+    public ConferenceRoomDto create(@Valid @RequestBody ConferenceRoomCreateRequest request){
+        log.info("Methode createConferenceRoom was called");
+        return conferenceRoomService.create(request);
     }
 
     @PutMapping
-    public OrganizationDto updateOrganization(
-            @RequestBody OrganizationUpdateRequest request) {
-        log.info("Methode updateOrganization was called");
-        return organizationService.updateOrganization(request);
+    public ConferenceRoomDto update(@RequestBody ConferenceRoomUpdateRequest request){
+        log.info("Methode updateConferenceRoom was called");
+        return conferenceRoomService.update(request);
     }
 
     @DeleteMapping("/{id}")
-    public void deleteOrganization(@PathVariable(name = "id") Long organizationId) {
-        log.info("Methode deleteOrganization was called");
-        organizationService.deleteOrganization(organizationId);
+    public ConferenceRoomDto delete(@PathVariable(name = "id") Long conferenceRoomId){
+        log.info("Methode deleteConferenceRoom was called");
+        return conferenceRoomService.delete(conferenceRoomId);
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
@@ -77,4 +77,5 @@ public class OrganizationController {
         });
         return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
     }
+
 }
