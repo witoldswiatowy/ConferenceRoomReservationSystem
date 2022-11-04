@@ -1,5 +1,6 @@
 package pl.mojeprojecty.conferenceroomreservationsystem.conferenceRoom;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -66,7 +67,7 @@ class ConferenceRoomControllerTest {
                         "  \"name\": \"Java\",\n" +
                         "  \"numberOfHammock\": 0,\n" +
                         "  \"numberOfSeats\": 0,\n" +
-                        "  \"organizationId\": 1\n" +
+                        "  \"organizationId\": " + google.getId() + "\n" +
                         "}"))
                 .andExpect(jsonPath("$.name", equalTo("Java")))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.floor", equalTo(1)));
@@ -81,17 +82,18 @@ class ConferenceRoomControllerTest {
         //when, then
         mockMvc.perform(MockMvcRequestBuilders.put("/api/conferenceRooms").contentType(MediaType.APPLICATION_JSON)
                 .content("{\n" +
-                        "  \"availability\": true,\n" +
-                        "  \"floor\": 0,\n" +
                         "  \"conferenceRoomId\": 2,\n" +
-                        "  \"identifier\": \"string\",\n" +
-                        "  \"name\": \"string\",\n" +
-                        "  \"numberOfHammock\": 0,\n" +
-                        "  \"numberOfSeats\": 0,\n" +
-                        "  \"organizationId\": 1\n" +
+                        "  \"name\": \"Zmieniona\",\n" +
+                        "  \"organizationId\": " + google.getId() + "\n" +
                         "}"))
                 .andExpect(jsonPath("$.name", equalTo("Zmieniona")))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.floor", equalTo(1)));
+    }
+
+    @AfterEach
+    public void tearDown() {
+        conferenceRoomRepository.deleteAll();
+        organizationRepository.deleteAll();
     }
 
 }

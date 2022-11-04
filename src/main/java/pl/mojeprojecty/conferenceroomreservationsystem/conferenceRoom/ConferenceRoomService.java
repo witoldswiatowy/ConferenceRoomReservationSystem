@@ -61,27 +61,31 @@ public class ConferenceRoomService {
     }
 
     ConferenceRoomDto update(ConferenceRoomUpdateRequest request) {
-        ConferenceRoomEntity conferenceRoomEntity = conferenceRoomRepository.findById(request.getConferenceRoomId())
-                .orElseThrow(() -> new EntityNotFoundException("No Conference Room to update found!"));
-
         if (conferenceRoomRepository.existsByIdentifier(request.getIdentifier())) {
             throw new IllegalArgumentException("Conference Room with this identifier already exists!");
         }
 
+        final String updateName = request.getName();
+        final String updatedIdentifier = request.getIdentifier();
+        final Integer updatedFloor = request.getFloor();
+        final Boolean updatedAvailability = request.getAvailability();
+        final Integer updatedNumberOfSeats = request.getNumberOfSeats();
+        final Integer updatedNumberOfHammock = request.getNumberOfHammock();
         OrganizationEntity managedOrganization = organizationRepository.findById(request.getOrganizationId())
                 .orElseThrow(() -> new EntityNotFoundException("No organization to found!"));
 
-        if(conferenceRoomRepository.existsByNameAndOrganization_Id(request.getName(), request.getOrganizationId())){
-            throw new IllegalArgumentException("Conference Room with this name already exist in organization!");
-        }
-
-        conferenceRoomEntity.setName(request.getName());
-        conferenceRoomEntity.setIdentifier(request.getIdentifier());
-        conferenceRoomEntity.setFloor(request.getFloor());
-        conferenceRoomEntity.setAvailability(request.isAvailability());
-        conferenceRoomEntity.setNumberOfSeats(request.getNumberOfSeats());
-        conferenceRoomEntity.setNumberOfHammock(request.getNumberOfHammock());
-        conferenceRoomEntity.setOrganization(managedOrganization);
+        ConferenceRoomEntity conferenceRoomEntity = conferenceRoomRepository.findById(request.getConferenceRoomId())
+                .map(cr -> {
+                    cr.setName(updateName != null ? updateName : cr.getName());
+                    cr.setIdentifier(updatedIdentifier != null ? updatedIdentifier : cr.getIdentifier());
+                    cr.setFloor(updatedFloor != null ? updatedFloor : cr.getFloor());
+                    cr.setAvailability(updatedAvailability != null ? updatedAvailability : cr.isAvailability());
+                    cr.setNumberOfSeats(updatedNumberOfSeats != null ? updatedNumberOfSeats : cr.getNumberOfSeats());
+                    cr.setNumberOfHammock(updatedNumberOfHammock != null ? updatedNumberOfHammock : cr.getNumberOfHammock());
+                    cr.setOrganization(managedOrganization != null ? managedOrganization : cr.getOrganization());
+                    return cr;
+                })
+                .orElseThrow(() -> new EntityNotFoundException("No Conference Room to update found!"));
 
         ConferenceRoomEntity updatedOrganizationEntity = conferenceRoomRepository.save(conferenceRoomEntity);
         log.info("Update conference room {}", updatedOrganizationEntity);
