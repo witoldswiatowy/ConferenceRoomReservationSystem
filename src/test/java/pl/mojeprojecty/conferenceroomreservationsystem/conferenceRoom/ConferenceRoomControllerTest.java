@@ -1,5 +1,6 @@
 package pl.mojeprojecty.conferenceroomreservationsystem.conferenceRoom;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -66,7 +67,7 @@ class ConferenceRoomControllerTest {
                         "  \"name\": \"Java\",\n" +
                         "  \"numberOfHammock\": 0,\n" +
                         "  \"numberOfSeats\": 0,\n" +
-                        "  \"organizationId\": 1\n" +
+                        "  \"organizationId\": " + google.getId() + "\n" +
                         "}"))
                 .andExpect(jsonPath("$.name", equalTo("Java")))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.floor", equalTo(1)));
@@ -77,16 +78,22 @@ class ConferenceRoomControllerTest {
         //given
         OrganizationEntity google = organizationRepository.save(new OrganizationEntity("Google"));
         ConferenceRoomEntity barbados = new ConferenceRoomEntity("Barbados", "Barbados", 1, true, 10, 2, google);
-
+        ConferenceRoomEntity barbadosSaved = conferenceRoomRepository.save(barbados);
         //when, then
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/conferenceRooms").contentType(MediaType.APPLICATION_JSON)
+        mockMvc.perform(MockMvcRequestBuilders.put("/api/conferenceRooms").contentType(MediaType.APPLICATION_JSON)
                 .content("{\n" +
-                        "  \"id\": 1,\n" +
+                        "  \"id\": 2,\n" +
                         "  \"name\": \"Zmieniona\",\n" +
-                        "  \"organizationId\": 1\n" +
+                        "  \"organizationId\": " + google.getId() + "\n" +
                         "}"))
                 .andExpect(jsonPath("$.name", equalTo("Zmieniona")))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.floor", equalTo(1)));
+    }
+
+    @AfterEach
+    public void tearDown() {
+        conferenceRoomRepository.deleteAll();
+        organizationRepository.deleteAll();
     }
 
 }

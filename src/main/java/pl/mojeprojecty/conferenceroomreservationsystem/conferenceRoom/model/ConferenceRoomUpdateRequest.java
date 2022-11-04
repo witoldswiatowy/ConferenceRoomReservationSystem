@@ -27,9 +27,9 @@ public class ConferenceRoomUpdateRequest {
     private String identifier;
     @Min(0)
     @Max(10)
-    private int floor;
-    private boolean availability;
-    private int numberOfSeats;
-    private int numberOfHammock;
+    private Integer floor;
+    private Boolean availability;
+    private Integer numberOfSeats;
+    private Integer numberOfHammock;
     private Long organizationId;
 }

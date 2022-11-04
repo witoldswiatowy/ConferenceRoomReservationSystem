@@ -60,7 +60,7 @@ public class ConferenceRoomMapper {
         conferenceRoomEntity.setName(request.getName());
         conferenceRoomEntity.setIdentifier(request.getIdentifier());
         conferenceRoomEntity.setFloor(request.getFloor());
-        conferenceRoomEntity.setAvailability(request.isAvailability());
+        conferenceRoomEntity.setAvailability(request.getAvailability());
         conferenceRoomEntity.setNumberOfSeats(request.getNumberOfSeats());
         conferenceRoomEntity.setNumberOfHammock(request.getNumberOfHammock());
         return conferenceRoomEntity;
@@ -72,7 +72,7 @@ public class ConferenceRoomMapper {
         conferenceRoomEntity.setName(request.getName());
         conferenceRoomEntity.setIdentifier(request.getIdentifier());
         conferenceRoomEntity.setFloor(request.getFloor());
-        conferenceRoomEntity.setAvailability(request.isAvailability());
+        conferenceRoomEntity.setAvailability(request.getAvailability());
         conferenceRoomEntity.setNumberOfSeats(request.getNumberOfSeats());
         conferenceRoomEntity.setNumberOfHammock(request.getNumberOfHammock());
         return conferenceRoomEntity;
